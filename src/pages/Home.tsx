@@ -1,10 +1,11 @@
+import NewsFeed from "../components/NewsFeed";
 
 const Home = () => {
   return (
-    <div>
-      Home
-    </div>
-  )
-}
+    <>
+      <NewsFeed />
+    </>
+  );
+};
 
-export default Home
+export default Home;

@@ -1,16 +1,15 @@
-
 import { useRoutes } from "react-router-dom";
 import { routes } from "./route";
 import Navbar from "./components/Navbar";
 
-function App() {
+const App = () => {
   const router = useRoutes(routes);
   return (
     <>
       <Navbar />
-      {router}     
+      {router}
     </>
   );
-}
+};
 
 export default App;
