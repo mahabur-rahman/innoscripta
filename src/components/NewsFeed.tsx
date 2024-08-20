@@ -1,5 +1,6 @@
 import FeedCard from "./FeedCard";
 import NewsFeedWidget from "./NewsFeetTitle";
+import SearchBar from "./Search";
 
 const NewsFeed = () => {
   return (
@@ -11,6 +12,10 @@ const NewsFeed = () => {
             "Stay informed with the latest positive news from around the world."
           }
         />
+
+        {/* search bar */}
+        <SearchBar />
+
         <div className="grid gap-8 lg:grid-cols-3 sm:max-w-sm sm:mx-auto lg:max-w-full">
           <FeedCard />
           <FeedCard />
