@@ -1,4 +1,4 @@
-import { newsFeedWidgetProps } from "../interfaces/NewsFeed.interface";
+import { newsFeedWidgetProps } from "../interfaces/newsFeed.interface";
 
 const NewsFeedWidget = ({ pageTitle, content }: newsFeedWidgetProps) => {
   return (

@@ -1,5 +1,5 @@
 import FeedCard from "./FeedCard";
-import NewsFeedWidget from "./NewsFeetTitle";
+import NewsFeedWidget from "../common/NewsFeedWidget";
 import SearchBar from "./Search";
 
 const NewsFeed = () => {
