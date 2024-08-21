@@ -48,7 +48,7 @@ const SearchBar = () => {
         />
         <RangePicker className="w-full" />
       </div>
-      {/* <p className="mb-3 text-sm">Total 402 news found in this search criteria</p> */}
+
     </>
   );
 };

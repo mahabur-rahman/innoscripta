@@ -10,7 +10,7 @@ const SidebarCard = ({ item }: SidebarCardProps) => {
           <div className="mb-4 lg:mb-0">
             <h5 className="mb-4 text-lg font-bold leading-none line-clamp-1">
               {item.webTitle.length > 15
-                ? `${item.webTitle.slice(0, 15)}...`
+                ? `${item?.webTitle.slice(0, 15)}...`
                 : item.webTitle}
             </h5>
             <div className="relative pr-8">
