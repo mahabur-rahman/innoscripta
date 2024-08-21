@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
+import { FeedCardProps } from "../interfaces/newsFeed.interface";
 
-const FeedCard = ({ article }) => {
+const FeedCard = ({ article }: FeedCardProps) => {
   return (
     <div className="overflow-hidden transition-shadow duration-300 bg-white rounded shadow-sm">
       <img
-        src={article.urlToImage}
+        src={article.urlToImage || 'default-image-url.jpg'} // Provide a fallback image URL if needed
         className="object-cover w-full h-64"
         alt={article.title}
       />

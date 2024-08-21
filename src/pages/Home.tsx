@@ -4,7 +4,6 @@ import NewsFeed from "../components/NewsFeed";
 import SidebarCard from "../components/SidebarCard";
 import { ApiResponse, NewsItem } from "../interfaces/newsFeed.interface";
 
-// Define the API endpoint as a constant
 const API_ENDPOINT =
   "https://content.guardianapis.com/search?q=football&pageSize=100&page=50&api-key=c0fc8bd3-b90b-4c16-af84-91fbdf3a313a";
 
