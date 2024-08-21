@@ -59,7 +59,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
 
   const handleSearchClick = () => {
     onSearch(searchQuery);
-    setSearchQuery(""); // Clear the input field
+    setSearchQuery(""); 
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -70,7 +70,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
 
   const handleSourceChange = (value: string) => {
     setSelectedSource(value);
-    onSourceChange(value); // Notify the parent component about the selected source
+    onSourceChange(value); 
   };
   
 
@@ -87,7 +87,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
             </button>
           ))}
         </div>
-        <button>Clear Filters</button>
       </div>
       <div className="grid grid-cols-1 gap-4 mb-8 md:grid-cols-3">
         <Input

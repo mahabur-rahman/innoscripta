@@ -18,7 +18,7 @@ const FeedCard = ({ article }: FeedCardProps) => {
           >
             {article?.source}
           </span>
-          <span className="text-gray-600">{article?.publishedAt}</span>
+          <span className="text-gray-600">{new Date(article?.publishedAt).toDateString()}</span>
         </p>
         <div
           aria-label="Category"
