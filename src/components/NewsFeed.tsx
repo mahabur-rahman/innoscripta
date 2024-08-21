@@ -6,7 +6,7 @@ import SearchBar from "./Search";
 import { Article } from "../interfaces/newsFeed.interface";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-const NEWS_API_KEY = "bb650e88963349fb939b1fe954769f1a";
+const NEWS_API_KEY = "de883712d0524b6498d08cbd5a16ee52";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
 const NYT_API_URL = "https://api.nytimes.com/svc/topstories/v2/world.json";
 const NYT_API_KEY = "0XQveFRbsEVehGpaTz5ERNkmQLKfAd2q";
@@ -137,6 +137,7 @@ const NewsFeed: React.FC = () => {
 
   return (
     <div className="px-4 py-4 mx-auto 2xl:py-16 sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8">
+      <h1>{articles?.length}</h1>
       <NewsFeedWidget
         pageTitle={"Latest News"}
         content={

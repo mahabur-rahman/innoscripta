@@ -32,7 +32,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
     const fetchSources = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines/sources?apiKey=bb650e88963349fb939b1fe954769f1a"
+          "https://newsapi.org/v2/top-headlines/sources?apiKey=de883712d0524b6498d08cbd5a16ee52"
         );
         const data = await response.json();
 
@@ -105,7 +105,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
           }
         />
         <Select
-          mode="tags"
+          // mode="tags"
           className="w-full"
           tokenSeparators={[","]}
           options={sources} // Apply the fetched sources here
