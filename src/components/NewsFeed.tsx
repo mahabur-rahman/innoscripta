@@ -4,6 +4,7 @@ import FeedCard from "./FeedCard";
 import NewsFeedWidget from "../common/NewsFeedWidget";
 import SearchBar from "./Search";
 import { Article } from "../interfaces/newsFeed.interface";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const NEWS_API_KEY = "65062e2270024cd5a94980583ac3ae30";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
@@ -26,11 +27,9 @@ const normalizeArticle = (article: any, source: string): Article => {
 const NewsFeed: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [page, setPage] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
 
   const fetchArticles = async (pageNumber: number) => {
-    setLoading(true);
     try {
       let response: AxiosResponse;
       let newArticles: Article[] = [];
@@ -64,8 +63,6 @@ const NewsFeed: React.FC = () => {
       );
     } catch (error) {
       console.error("Error fetching articles:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -74,9 +71,7 @@ const NewsFeed: React.FC = () => {
   }, [page]);
 
   const loadMore = () => {
-    if (!loading && hasMore) {
-      setPage((prevPage) => prevPage + 1);
-    }
+    setPage((prevPage) => prevPage + 1);
   };
 
   return (
@@ -85,23 +80,21 @@ const NewsFeed: React.FC = () => {
         pageTitle={"Latest News"}
         content={"Stay informed with the latest positive news from around the world."}
       />
-      {/* search bar */}
       <SearchBar />
 
-      <div className="grid gap-8 lg:grid-cols-3 sm:max-w-sm sm:mx-auto lg:max-w-full">
-        {articles.map((article) => (
-          <FeedCard key={article.url} article={article} />
-        ))}
-      </div>
-      {loading && <p>Loading...</p>}
-      {hasMore && !loading && (
-        <button
-          onClick={loadMore}
-          className="px-4 py-2 mt-4 text-white bg-blue-500 rounded"
-        >
-          Load More
-        </button>
-      )}
+      <InfiniteScroll
+        dataLength={articles.length}
+        next={loadMore}
+        hasMore={hasMore}
+        loader={<p className="my-4 text-center">Loading ...</p>}
+        endMessage={<p>No more articles to load.</p>}
+      >
+        <div className="grid gap-8 lg:grid-cols-3 sm:max-w-sm sm:mx-auto lg:max-w-full">
+          {articles.map((article) => (
+            <FeedCard key={article.url} article={article} />
+          ))}
+        </div>
+      </InfiniteScroll>
     </div>
   );
 };
