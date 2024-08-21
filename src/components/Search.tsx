@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Input, Select, DatePicker } from "antd";
+import React, { useState, useEffect } from "react";
+import { Input, Select, DatePicker, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import type { SelectProps } from "antd";
 
@@ -24,6 +24,32 @@ interface SearchBarProps {
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [sources, setSources] = useState<SelectProps["options"]>([]);
+
+  useEffect(() => {
+    const fetchSources = async () => {
+      try {
+        const response = await fetch(
+          "https://newsapi.org/v2/top-headlines/sources?apiKey=cfb7ab0220f44783bb64f35747d7cc4e"
+        );
+        const data = await response.json();
+
+        if (data.status === "ok") {
+          const sourceOptions = data.sources.map((source: any) => ({
+            value: source.name,
+            label: source.name,
+          }));
+          setSources(sourceOptions);
+        } else {
+          message.error("Failed to fetch sources");
+        }
+      } catch (error) {
+        message.error("An error occurred while fetching sources");
+      }
+    };
+
+    fetchSources();
+  }, []);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -39,11 +65,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
       handleSearchClick();
     }
   };
-
-  const options: SelectProps["options"] = Array.from({ length: 26 }, (_, i) => {
-    const value = (i + 10).toString(36) + (i + 10);
-    return { value, label: value };
-  });
 
   return (
     <>
@@ -79,7 +100,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           mode="tags"
           className="w-full"
           tokenSeparators={[","]}
-          options={options}
+          options={sources} // Apply the fetched sources here
           placeholder="Select sources..."
         />
         <RangePicker className="w-full" />
