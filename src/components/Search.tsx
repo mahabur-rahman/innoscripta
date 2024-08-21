@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Input, Select, DatePicker } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import type { SelectProps } from "antd";
 
 const { RangePicker } = DatePicker;
@@ -26,7 +27,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
-    onSearch(event.target.value);
+  };
+
+  const handleSearchClick = () => {
+    onSearch(searchQuery);
+    setSearchQuery(""); // Clear the input field
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearchClick();
+    }
   };
 
   const options: SelectProps["options"] = Array.from({ length: 26 }, (_, i) => {
@@ -54,8 +65,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           placeholder="Search news.."
           value={searchQuery}
           onChange={handleSearchChange}
-          allowClear
+          onKeyDown={handleKeyDown}
           className="w-full"
+          suffix={
+            <SearchOutlined
+              onClick={handleSearchClick}
+              style={{ cursor: "pointer" }}
+              className="p-2 text-gray-200 bg-blue-500 rounded"
+            />
+          }
         />
         <Select
           mode="tags"

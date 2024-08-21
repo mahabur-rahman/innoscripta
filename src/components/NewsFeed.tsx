@@ -6,7 +6,7 @@ import SearchBar from "./Search";
 import { Article } from "../interfaces/newsFeed.interface";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-const NEWS_API_KEY = "b933ed9c65ee45fa8551898ec281a04b";
+const NEWS_API_KEY = "cfb7ab0220f44783bb64f35747d7cc4e";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
 const NYT_API_URL = "https://api.nytimes.com/svc/topstories/v2/world.json";
 const NYT_API_KEY = "0XQveFRbsEVehGpaTz5ERNkmQLKfAd2q";
@@ -35,18 +35,36 @@ const NewsFeed: React.FC = () => {
       let response: AxiosResponse;
       let newArticles: Article[] = [];
 
-      if (articles.length >= 100) {
-        response = await axios.get(NYT_API_URL, {
-          params: { "api-key": NYT_API_KEY },
-        });
-        const nytArticles = response.data.results;
-        newArticles = nytArticles.map((article: any) =>
-          normalizeArticle(article, "New York Times")
-        );
+      if (query === "") {
+        // Fetch from both APIs if the query is empty
+        const [nytResponse, newsResponse] = await Promise.all([
+          axios.get(NYT_API_URL, { params: { "api-key": NYT_API_KEY } }),
+          axios.get(NEWS_BASE_URL, {
+            params: {
+              q: "news",
+              apiKey: NEWS_API_KEY,
+              page: pageNumber,
+              pageSize: 10,
+            },
+          }),
+        ]);
+
+        const nytArticles = nytResponse.data.results;
+        const newsArticles = newsResponse.data.articles;
+
+        newArticles = [
+          ...nytArticles.map((article: any) =>
+            normalizeArticle(article, "New York Times")
+          ),
+          ...newsArticles.map((article: any) =>
+            normalizeArticle(article, "NewsAPI")
+          ),
+        ];
       } else {
+        // Fetch from NewsAPI only if query is not empty
         response = await axios.get(NEWS_BASE_URL, {
           params: {
-            q: query || "news",
+            q: query,
             apiKey: NEWS_API_KEY,
             page: pageNumber,
             pageSize: 10,
@@ -70,6 +88,15 @@ const NewsFeed: React.FC = () => {
   useEffect(() => {
     fetchArticles(page, searchQuery);
   }, [page, searchQuery]);
+
+  useEffect(() => {
+    // Trigger API call when searchQuery is cleared
+    if (searchQuery.length === 0) {
+      setPage(1); // Reset page number
+      setArticles([]); // Clear existing articles
+      fetchArticles(1, ""); // Fetch from both APIs
+    }
+  }, [searchQuery]);
 
   const loadMore = () => {
     setPage((prevPage) => prevPage + 1);
@@ -95,7 +122,7 @@ const NewsFeed: React.FC = () => {
         next={loadMore}
         hasMore={hasMore}
         loader={<p className="my-4 text-center">Loading ...</p>}
-        endMessage={<p>No more articles to load.</p>}
+        endMessage={<p className="text-center text-red-500">No more articles to load.</p>}
       >
         <div className="grid gap-8 lg:grid-cols-3 sm:max-w-sm sm:mx-auto lg:max-w-full">
           {articles.map((article) => (
