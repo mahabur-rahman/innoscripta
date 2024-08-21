@@ -5,8 +5,9 @@ import NewsFeedWidget from "../common/NewsFeedWidget";
 import SearchBar from "./Search";
 import { Article } from "../interfaces/newsFeed.interface";
 import InfiniteScroll from "react-infinite-scroll-component";
+import moment, { Moment } from "moment";
 
-const NEWS_API_KEY = "de883712d0524b6498d08cbd5a16ee52";
+const NEWS_API_KEY = "baa0e2f8cac745218d984d5dd8d60020";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
 const NYT_API_URL = "https://api.nytimes.com/svc/topstories/v2/world.json";
 const NYT_API_KEY = "0XQveFRbsEVehGpaTz5ERNkmQLKfAd2q";
@@ -30,15 +31,20 @@ const NewsFeed: React.FC = () => {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSource, setSelectedSource] = useState<string>("");
+  const [dateRange, setDateRange] = useState<[Moment, Moment] | null>(null);
 
   const fetchArticles = async (
     pageNumber: number,
     query: string,
-    source: string
+    source: string,
+    dateRange?: [Moment, Moment]
   ) => {
     try {
       let response: AxiosResponse;
       let newArticles: Article[] = [];
+
+      const fromDate = dateRange ? dateRange[0].format("YYYY-MM-DD") : '';
+      const toDate = dateRange ? dateRange[1].format("YYYY-MM-DD") : '';
 
       if (source) {
         // Fetch articles from the selected source
@@ -48,7 +54,8 @@ const NewsFeed: React.FC = () => {
             apiKey: NEWS_API_KEY,
             page: pageNumber,
             pageSize: 10,
-            sources: source, // Apply the selected source
+            sources: source,
+            ...(fromDate && toDate && { from: fromDate, to: toDate }), // Add date range if available
           },
         });
         const newsArticles = response.data.articles;
@@ -61,10 +68,11 @@ const NewsFeed: React.FC = () => {
           axios.get(NYT_API_URL, { params: { "api-key": NYT_API_KEY } }),
           axios.get(NEWS_BASE_URL, {
             params: {
-              q:  "news",
+              q: "news",
               apiKey: NEWS_API_KEY,
               page: pageNumber,
               pageSize: 10,
+              ...(fromDate && toDate && { from: fromDate, to: toDate }), // Add date range if available
             },
           }),
         ]);
@@ -88,6 +96,7 @@ const NewsFeed: React.FC = () => {
             apiKey: NEWS_API_KEY,
             page: pageNumber,
             pageSize: 10,
+            ...(fromDate && toDate && { from: fromDate, to: toDate }), // Add date range if available
           },
         });
         const newsArticles = response.data.articles;
@@ -106,61 +115,46 @@ const NewsFeed: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchArticles(page, searchQuery, selectedSource);
-  }, [page, searchQuery, selectedSource]);
+    fetchArticles(page, searchQuery, selectedSource, dateRange);
+  }, [page, searchQuery, selectedSource, dateRange]);
 
-  useEffect(() => {
-    // Trigger API call when searchQuery is cleared
-    if (searchQuery.length === 0) {
-      setPage(1); // Reset page number
-      setArticles([]); // Clear existing articles
-      fetchArticles(1, "", selectedSource); // Fetch from both APIs
-    }
-  }, [searchQuery]);
-
-  const loadMore = () => {
-    setPage((prevPage) => prevPage + 1);
-  };
-
-  const handleSearch = (query: string) => {
+  const handleSearch = (query: string, dateRange?: [Moment, Moment]) => {
     setSearchQuery(query);
-    setPage(1); // Reset page number when new search is performed
-    setArticles([]); // Clear existing articles
+    setDateRange(dateRange);
+    setPage(1);
+    setArticles([]);
+    fetchArticles(1, query, selectedSource, dateRange);
   };
 
   const handleSourceChange = (source: string) => {
     setSelectedSource(source);
-    setPage(1); // Reset page number
-    setArticles([]); // Clear existing articles
-    fetchArticles(1, searchQuery, source); // Fetch articles with new source
+    setPage(1);
+    setArticles([]);
+    fetchArticles(1, searchQuery, source, dateRange);
+  };
+
+  const loadMoreArticles = () => {
+    setPage((prevPage) => prevPage + 1);
   };
 
   return (
-    <div className="px-4 py-4 mx-auto 2xl:py-16 sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8">
-      <h1>{articles?.length}</h1>
-      <NewsFeedWidget
-        pageTitle={"Latest News"}
-        content={
-          "Stay informed with the latest positive news from around the world."
-        }
-      />
-
+    <>
       <SearchBar onSearch={handleSearch} onSourceChange={handleSourceChange} />
-
+      {articles && articles.length}
       <InfiniteScroll
         dataLength={articles.length}
-        next={loadMore}
+        next={loadMoreArticles}
         hasMore={hasMore}
         loader={<h4>Loading...</h4>}
-        endMessage={<p>No more articles to display</p>}
       >
-        <div className="grid gap-8 lg:grid-cols-3 sm:max-w-sm sm:mx-auto lg:max-w-full">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {articles.map((article) => (
             <FeedCard key={article.url} article={article} />
           ))}
         </div>
       </InfiniteScroll>
-    </div>
+      <NewsFeedWidget />
+    </>
   );
 };
 

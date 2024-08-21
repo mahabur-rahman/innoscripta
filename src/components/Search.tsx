@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Input, Select, DatePicker, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import type { SelectProps } from "antd";
+import moment, { Moment } from "moment";
 
 const { RangePicker } = DatePicker;
 
@@ -19,7 +20,7 @@ const categories = [
 ];
 
 interface SearchBarProps {
-  onSearch: (query: string) => void;
+  onSearch: (query: string, dateRange?: [Moment, Moment]) => void;
   onSourceChange: (source: string) => void;
 }
 
@@ -27,12 +28,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sources, setSources] = useState<SelectProps["options"]>([]);
   const [selectedSource, setSelectedSource] = useState<string>("");
+  const [dateRange, setDateRange] = useState<[Moment, Moment] | null>(null);
 
   useEffect(() => {
     const fetchSources = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines/sources?apiKey=de883712d0524b6498d08cbd5a16ee52"
+          "https://newsapi.org/v2/top-headlines/sources?apiKey=baa0e2f8cac745218d984d5dd8d60020"
         );
         const data = await response.json();
 
@@ -58,8 +60,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
   };
 
   const handleSearchClick = () => {
-    onSearch(searchQuery);
-    setSearchQuery(""); 
+    onSearch(searchQuery, dateRange);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -70,9 +71,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
 
   const handleSourceChange = (value: string) => {
     setSelectedSource(value);
-    onSourceChange(value); 
+    onSourceChange(value);
   };
-  
+
+  const handleDateRangeChange = (dates: [Moment, Moment] | null) => {
+    setDateRange(dates as [Moment, Moment]); // Cast to non-nullable if needed
+    onSearch(searchQuery, dates as [Moment, Moment]);
+  };
 
   return (
     <>
@@ -104,15 +109,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
           }
         />
         <Select
-          // mode="tags"
           className="w-full"
-          tokenSeparators={[","]}
-          options={sources} // Apply the fetched sources here
+          options={sources}
           placeholder="Select sources..."
           onChange={handleSourceChange}
         />
-
-        <RangePicker className="w-full" />
+        <RangePicker
+          className="w-full"
+          onChange={handleDateRangeChange}
+        />
       </div>
     </>
   );
