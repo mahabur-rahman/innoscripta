@@ -20,23 +20,25 @@ const categories = [
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
+  onSourceChange: (source: string) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sources, setSources] = useState<SelectProps["options"]>([]);
+  const [selectedSource, setSelectedSource] = useState<string>("");
 
   useEffect(() => {
     const fetchSources = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines/sources?apiKey=cfb7ab0220f44783bb64f35747d7cc4e"
+          "https://newsapi.org/v2/top-headlines/sources?apiKey=bb650e88963349fb939b1fe954769f1a"
         );
         const data = await response.json();
 
         if (data.status === "ok") {
           const sourceOptions = data.sources.map((source: any) => ({
-            value: source.name,
+            value: source.id,
             label: source.name,
           }));
           setSources(sourceOptions);
@@ -65,6 +67,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
       handleSearchClick();
     }
   };
+
+  const handleSourceChange = (value: string) => {
+    setSelectedSource(value);
+    onSourceChange(value); // Notify the parent component about the selected source
+  };
+  
 
   return (
     <>
@@ -102,7 +110,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           tokenSeparators={[","]}
           options={sources} // Apply the fetched sources here
           placeholder="Select sources..."
+          onChange={handleSourceChange}
         />
+
         <RangePicker className="w-full" />
       </div>
     </>

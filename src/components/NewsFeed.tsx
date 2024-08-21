@@ -6,7 +6,7 @@ import SearchBar from "./Search";
 import { Article } from "../interfaces/newsFeed.interface";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-const NEWS_API_KEY = "cfb7ab0220f44783bb64f35747d7cc4e";
+const NEWS_API_KEY = "bb650e88963349fb939b1fe954769f1a";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
 const NYT_API_URL = "https://api.nytimes.com/svc/topstories/v2/world.json";
 const NYT_API_KEY = "0XQveFRbsEVehGpaTz5ERNkmQLKfAd2q";
@@ -29,19 +29,39 @@ const NewsFeed: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedSource, setSelectedSource] = useState<string>("");
 
-  const fetchArticles = async (pageNumber: number, query: string) => {
+  const fetchArticles = async (
+    pageNumber: number,
+    query: string,
+    source: string
+  ) => {
     try {
       let response: AxiosResponse;
       let newArticles: Article[] = [];
 
-      if (query === "") {
+      if (source) {
+        // Fetch articles from the selected source
+        response = await axios.get(NEWS_BASE_URL, {
+          params: {
+            q: query || 'general',
+            apiKey: NEWS_API_KEY,
+            page: pageNumber,
+            pageSize: 10,
+            sources: source, // Apply the selected source
+          },
+        });
+        const newsArticles = response.data.articles;
+        newArticles = newsArticles.map((article: any) =>
+          normalizeArticle(article, "NewsAPI")
+        );
+      } else if (query === "") {
         // Fetch from both APIs if the query is empty
         const [nytResponse, newsResponse] = await Promise.all([
           axios.get(NYT_API_URL, { params: { "api-key": NYT_API_KEY } }),
           axios.get(NEWS_BASE_URL, {
             params: {
-              q: "news",
+              q:  "news",
               apiKey: NEWS_API_KEY,
               page: pageNumber,
               pageSize: 10,
@@ -86,15 +106,15 @@ const NewsFeed: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchArticles(page, searchQuery);
-  }, [page, searchQuery]);
+    fetchArticles(page, searchQuery, selectedSource);
+  }, [page, searchQuery, selectedSource]);
 
   useEffect(() => {
     // Trigger API call when searchQuery is cleared
     if (searchQuery.length === 0) {
       setPage(1); // Reset page number
       setArticles([]); // Clear existing articles
-      fetchArticles(1, ""); // Fetch from both APIs
+      fetchArticles(1, "", selectedSource); // Fetch from both APIs
     }
   }, [searchQuery]);
 
@@ -108,21 +128,30 @@ const NewsFeed: React.FC = () => {
     setArticles([]); // Clear existing articles
   };
 
+  const handleSourceChange = (source: string) => {
+    setSelectedSource(source);
+    setPage(1); // Reset page number
+    setArticles([]); // Clear existing articles
+    fetchArticles(1, searchQuery, source); // Fetch articles with new source
+  };
+
   return (
     <div className="px-4 py-4 mx-auto 2xl:py-16 sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8">
       <NewsFeedWidget
         pageTitle={"Latest News"}
-        content={"Stay informed with the latest positive news from around the world."}
+        content={
+          "Stay informed with the latest positive news from around the world."
+        }
       />
 
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar onSearch={handleSearch} onSourceChange={handleSourceChange} />
 
       <InfiniteScroll
         dataLength={articles.length}
         next={loadMore}
         hasMore={hasMore}
-        loader={<p className="my-4 text-center">Loading ...</p>}
-        endMessage={<p className="text-center text-red-500">No more articles to load.</p>}
+        loader={<h4>Loading...</h4>}
+        endMessage={<p>No more articles to display</p>}
       >
         <div className="grid gap-8 lg:grid-cols-3 sm:max-w-sm sm:mx-auto lg:max-w-full">
           {articles.map((article) => (
