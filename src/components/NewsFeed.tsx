@@ -6,7 +6,7 @@ import SearchBar from "./Search";
 import { Article } from "../interfaces/newsFeed.interface";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-const NEWS_API_KEY = "65062e2270024cd5a94980583ac3ae30";
+const NEWS_API_KEY = "b933ed9c65ee45fa8551898ec281a04b";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
 const NYT_API_URL = "https://api.nytimes.com/svc/topstories/v2/world.json";
 const NYT_API_KEY = "0XQveFRbsEVehGpaTz5ERNkmQLKfAd2q";
@@ -28,8 +28,9 @@ const NewsFeed: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const fetchArticles = async (pageNumber: number) => {
+  const fetchArticles = async (pageNumber: number, query: string) => {
     try {
       let response: AxiosResponse;
       let newArticles: Article[] = [];
@@ -45,7 +46,7 @@ const NewsFeed: React.FC = () => {
       } else {
         response = await axios.get(NEWS_BASE_URL, {
           params: {
-            q: "news",
+            q: query || "news",
             apiKey: NEWS_API_KEY,
             page: pageNumber,
             pageSize: 10,
@@ -67,11 +68,17 @@ const NewsFeed: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchArticles(page);
-  }, [page]);
+    fetchArticles(page, searchQuery);
+  }, [page, searchQuery]);
 
   const loadMore = () => {
     setPage((prevPage) => prevPage + 1);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setPage(1); // Reset page number when new search is performed
+    setArticles([]); // Clear existing articles
   };
 
   return (
@@ -80,7 +87,8 @@ const NewsFeed: React.FC = () => {
         pageTitle={"Latest News"}
         content={"Stay informed with the latest positive news from around the world."}
       />
-      <SearchBar />
+
+      <SearchBar onSearch={handleSearch} />
 
       <InfiniteScroll
         dataLength={articles.length}

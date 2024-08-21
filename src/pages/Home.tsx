@@ -9,7 +9,6 @@ const API_ENDPOINT =
 
 const Home: React.FC = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -17,21 +16,18 @@ const Home: React.FC = () => {
       try {
         const response = await axios.get<ApiResponse>(API_ENDPOINT);
         setNews(response?.data?.response?.results);
-        setLoading(false);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           setError(error.message || "An unexpected error occurred.");
         } else {
           setError("An unexpected error occurred.");
         }
-        setLoading(false);
       }
-    };
+    };  
 
     fetchData();
   }, []);
 
-  // if (loading) return <p>Loading...</p>;
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-12">

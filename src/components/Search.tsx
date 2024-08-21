@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Input, Select, DatePicker } from "antd";
 import type { SelectProps } from "antd";
 
@@ -16,7 +17,18 @@ const categories = [
   "Live",
 ];
 
-const SearchBar = () => {
+interface SearchBarProps {
+  onSearch: (query: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+    onSearch(event.target.value);
+  };
+
   const options: SelectProps["options"] = Array.from({ length: 26 }, (_, i) => {
     const value = (i + 10).toString(36) + (i + 10);
     return { value, label: value };
@@ -38,7 +50,13 @@ const SearchBar = () => {
         <button>Clear Filters</button>
       </div>
       <div className="grid grid-cols-1 gap-4 mb-8 md:grid-cols-3">
-        <Input placeholder="Search news.." allowClear className="w-full" />
+        <Input
+          placeholder="Search news.."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          allowClear
+          className="w-full"
+        />
         <Select
           mode="tags"
           className="w-full"
@@ -48,7 +66,6 @@ const SearchBar = () => {
         />
         <RangePicker className="w-full" />
       </div>
-
     </>
   );
 };
