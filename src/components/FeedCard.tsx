@@ -33,7 +33,7 @@ const FeedCard = ({ article }: FeedCardProps) => {
           to={article?.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center font-semibold transition-colors duration-200 text-deep-purple-accent-400 hover:text-deep-purple-800"
+          className="inline-flex items-center text-blue-500 transition-colors duration-200 text-deep-purple-accent-400 hover:text-deep-purple-800"
         >
           Read More
         </Link>

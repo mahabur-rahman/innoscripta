@@ -3,7 +3,7 @@ import axios from "axios";
 import NewsFeed from "../components/NewsFeed";
 import SidebarCard from "../components/SidebarCard";
 import { ApiResponse, NewsItem } from "../interfaces/newsFeed.interface";
-import { Pagination, Skeleton } from "antd";
+import { Pagination, Skeleton, Alert } from "antd";
 import "antd/dist/reset.css"; // Ensure Ant Design styles are included
 
 const API_ENDPOINT =
@@ -21,8 +21,8 @@ const Home: React.FC = () => {
         const response = await axios.get<ApiResponse>(
           `${API_ENDPOINT}${page}&api-key=c0fc8bd3-b90b-4c16-af84-91fbdf3a313a`
         );
-        setNews(response.data.response.results);
-        setTotalPages(Math.ceil(response.data.response.total / 10)); // Assuming pageSize is 10
+        setNews(response.data.response?.results);
+        setTotalPages(Math.ceil(response?.data?.response?.total / 10));
       } catch (error) {
         if (axios.isAxiosError(error)) {
           setError(error.message || "An unexpected error occurred.");
@@ -45,10 +45,14 @@ const Home: React.FC = () => {
         <NewsFeed />
       </div>
 
-      <div className="p-4 md:col-span-3 xl:p-0 ">
-        <div className="bottom-0 w-1/4 h-screen pb-4 overflow-y-scroll 2xl:pb-4 xl:right-0 xl:fixed top-4 ">
-          <h4 className="pt-24 mb-0 text-2xl font-bold 2xl:pt-32">Breaking news</h4>
-          {news.length > 0 ? (
+      <div className="p-4 md:col-span-3 xl:p-0">
+        <div className="bottom-0 w-1/4 h-screen pb-4 overflow-y-scroll 2xl:pb-4 xl:right-0 xl:fixed top-4">
+          <h4 className="pt-24 mb-0 text-2xl font-bold text-red-400 capitalize 2xl:pt-32">
+            Breaking news
+          </h4>
+          {error ? (
+            <Alert description={error} type="error" showIcon className="my-4" />
+          ) : news.length > 0 ? (
             <>
               {news.map((item) => (
                 <SidebarCard key={item.id} item={item} />
@@ -56,7 +60,7 @@ const Home: React.FC = () => {
               <Pagination
                 current={currentPage}
                 pageSize={10}
-                total={totalPages * 10} // Total number of items (estimate)
+                total={totalPages * 10}
                 onChange={handlePageChange}
                 showSizeChanger={false}
                 align="center"
@@ -66,7 +70,7 @@ const Home: React.FC = () => {
             </>
           ) : (
             <>
-              <Skeleton  />
+              <Skeleton className="mt-8" />
               <Skeleton className="my-16" />
               <Skeleton />
             </>

@@ -12,6 +12,7 @@ export interface NewsItem {
 
 export interface ApiResponse {
   response: {
+    total: number;
     results: NewsItem[];
   };
 }
