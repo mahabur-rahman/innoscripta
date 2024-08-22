@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { Checkbox, List } from "antd";
+import { Button, Checkbox, List } from "antd";
 import NewsFeedWidget from "../common/NewsFeedWidget";
 import { Helmet } from "react-helmet";
+import {
+  SaveOutlined
+} from '@ant-design/icons';
 
 interface Author {
   name: string;
@@ -65,14 +68,17 @@ const Preferences: React.FC = () => {
       <Helmet>
         <title>Customize News Preferences...</title>
       </Helmet>
-      <div className="container p-4 mx-auto">
+      <div className="container p-4 mx-auto mt-24">
         <NewsFeedWidget
           pageTitle={"Preferences"}
           content={
             "Modify your settings to enhance and personalize your experience here."
           }
         />
-        <div className="grid grid-cols-3 gap-4 mt-4">
+         <Button type="primary" icon={<SaveOutlined /> } className="float-right">
+            Save Changes
+          </Button>
+        <div className="grid w-full grid-cols-3 gap-4 mt-4">
           <div>
             <h3 className="text-lg font-semibold">Authors</h3>
             <p className="text-gray-500">{authors.length} authors</p>
