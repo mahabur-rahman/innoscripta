@@ -83,9 +83,7 @@ const Preferences: React.FC = () => {
           pageTitle={"Preferences"}
           content={"Modify your settings to enhance and personalize your experience here."}
         />
-        <Button type="primary" icon={<SaveOutlined />} className="float-right">
-          Save Changes
-        </Button>
+      
         <div className="grid w-full grid-cols-3 gap-4 mt-4">
           <div>
             <h3 className="text-lg font-semibold">Authors</h3>
