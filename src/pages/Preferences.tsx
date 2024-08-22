@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Checkbox, List } from "antd";
 import NewsFeedWidget from "../common/NewsFeedWidget";
+import { Helmet } from "react-helmet";
 
 interface Author {
   name: string;
@@ -60,74 +61,85 @@ const Preferences: React.FC = () => {
   };
 
   return (
-    <div className="container p-4 mx-auto">
-      <NewsFeedWidget
-        pageTitle={"Preferences"}
-        content={
-          "Modify your settings to enhance and personalize your experience here."
-        }
-      />
-      <div className="grid grid-cols-3 gap-4 mt-4">
-        <div>
-          <h3 className="text-lg font-semibold">Authors</h3>
-          <p className="text-gray-500">{authors.length} authors</p>
-          <List
-            className="mt-4"
-            bordered
-            dataSource={authors}
-            renderItem={(item, index) => (
-              <List.Item>
-                <Checkbox
-                  checked={item.checked}
-                  onChange={(e) => handleAuthorChange(index, e.target.checked)}
-                >
-                  {item.name}
-                </Checkbox>
-              </List.Item>
-            )}
-          />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold">Sources</h3>
+    <>
+      <Helmet>
+        <title>Customize News Preferences...</title>
+      </Helmet>
+      <div className="container p-4 mx-auto">
+        <NewsFeedWidget
+          pageTitle={"Preferences"}
+          content={
+            "Modify your settings to enhance and personalize your experience here."
+          }
+        />
+        <div className="grid grid-cols-3 gap-4 mt-4">
+          <div>
+            <h3 className="text-lg font-semibold">Authors</h3>
+            <p className="text-gray-500">{authors.length} authors</p>
+            <List
+              className="mt-4"
+              bordered
+              dataSource={authors}
+              renderItem={(item, index) => (
+                <List.Item>
+                  <Checkbox
+                    checked={item.checked}
+                    onChange={(e) =>
+                      handleAuthorChange(index, e.target.checked)
+                    }
+                  >
+                    {item.name}
+                  </Checkbox>
+                </List.Item>
+              )}
+            />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Sources</h3>
 
-          <p className="text-gray-500">{sources.length} sources</p>
-          <List
-            bordered
-            dataSource={sources}
-            className="mt-4"
-            renderItem={(item, index) => (
-              <List.Item>
-                <Checkbox
-                  checked={item.checked}
-                  onChange={(e) => handleSourceChange(index, e.target.checked)}
-                >
-                  {item.name}
-                </Checkbox>
-              </List.Item>
-            )}
-          />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold">Categories</h3>
-          <p className="text-gray-500">{sources.length} sources</p>
-          <List
-            bordered
-            dataSource={sources}
-            className="mt-4"
-            renderItem={(item, index) => (
-              <List.Item>
-                <Checkbox
-                  checked={item.checked}
-                  onChange={(e) => handleSourceChange(index, e.target.checked)}
-                >
-                  {item.name}
-                </Checkbox>
-              </List.Item>
-            )}
-          />
+            <p className="text-gray-500">{sources.length} sources</p>
+            <List
+              bordered
+              dataSource={sources}
+              className="mt-4"
+              renderItem={(item, index) => (
+                <List.Item>
+                  <Checkbox
+                    checked={item.checked}
+                    onChange={(e) =>
+                      handleSourceChange(index, e.target.checked)
+                    }
+                  >
+                    {item.name}
+                  </Checkbox>
+                </List.Item>
+              )}
+            />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Categories</h3>
+            <p className="text-gray-500">{sources.length} sources</p>
+            <List
+              bordered
+              dataSource={sources}
+              className="mt-4"
+              renderItem={(item, index) => (
+                <List.Item>
+                  <Checkbox
+                    checked={item.checked}
+                    onChange={(e) =>
+                      handleSourceChange(index, e.target.checked)
+                    }
+                  >
+                    {item.name}
+                  </Checkbox>
+                </List.Item>
+              )}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
