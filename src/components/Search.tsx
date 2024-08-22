@@ -3,24 +3,15 @@ import { Input, Select, DatePicker, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import type { SelectProps } from "antd";
 import moment, { Moment } from "moment";
-
+import { newsApiCategories } from "../data/data";
 const { RangePicker } = DatePicker;
 
-const categories = [
-  "Home",
-  "News",
-  "Sport",
-  "Business",
-  "Innovation",
-  "Culture",
-  "Travel",
-  "Earth",
-  "Video",
-  "Live",
-];
-
 interface SearchBarProps {
-  onSearch: (query: string, dateRange?: [Moment, Moment]) => void;
+  onSearch: (
+    query: string,
+    dateRange?: [Moment, Moment],
+    category?: string
+  ) => void;
   onSourceChange: (source: string) => void;
 }
 
@@ -29,12 +20,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
   const [sources, setSources] = useState<SelectProps["options"]>([]);
   const [selectedSource, setSelectedSource] = useState<string>("");
   const [dateRange, setDateRange] = useState<[Moment, Moment] | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSources = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines/sources?apiKey=baa0e2f8cac745218d984d5dd8d60020"
+          "https://newsapi.org/v2/top-headlines/sources?apiKey=c5ba6f352abb4b528f1a66430b6897b1"
         );
         const data = await response.json();
 
@@ -60,7 +52,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
   };
 
   const handleSearchClick = () => {
-    onSearch(searchQuery, dateRange);
+    onSearch(searchQuery, dateRange, selectedCategory);
+    setSearchQuery('')
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -75,20 +68,26 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
   };
 
   const handleDateRangeChange = (dates: [Moment, Moment] | null) => {
-    setDateRange(dates as [Moment, Moment]); // Cast to non-nullable if needed
-    onSearch(searchQuery, dates as [Moment, Moment]);
+    setDateRange(dates as [Moment, Moment]);
+    onSearch(searchQuery, dates as [Moment, Moment], selectedCategory);
+  };
+
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(category);
+    onSearch(searchQuery, dateRange, category);
   };
 
   return (
     <>
       <div className="mb-2 text-red-500 text-end">
-        <div className="flex flex-wrap justify-center gap-4">
-          {categories.map((category) => (
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          {newsApiCategories.map((category) => (
             <button
-              key={category}
+              key={category.id}
+              onClick={() => handleCategoryClick(category.item)}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
             >
-              {category}
+              <span className="capitalize">{category.item}</span>
             </button>
           ))}
         </div>
@@ -99,7 +98,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
           value={searchQuery}
           onChange={handleSearchChange}
           onKeyDown={handleKeyDown}
-          className="w-full"
+          className="w-full h-12"
           suffix={
             <SearchOutlined
               onClick={handleSearchClick}
@@ -109,15 +108,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
           }
         />
         <Select
-          className="w-full"
+          className="w-full h-12"
           options={sources}
           placeholder="Select sources..."
           onChange={handleSourceChange}
         />
-        <RangePicker
-          className="w-full"
-          onChange={handleDateRangeChange}
-        />
+        <RangePicker className="w-full h-12" onChange={handleDateRangeChange} />
       </div>
     </>
   );

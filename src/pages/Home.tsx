@@ -23,14 +23,13 @@ const Home: React.FC = () => {
           setError("An unexpected error occurred.");
         }
       }
-    };  
+    };
 
     fetchData();
   }, []);
 
-
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-12 lg:px-4">
       <div className="md:col-span-9">
         <NewsFeed />
       </div>
