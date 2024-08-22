@@ -21,7 +21,7 @@ const Preferences: React.FC = () => {
     const fetchSources = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines/sources?apiKey=65062e2270024cd5a94980583ac3ae30"
+          "https://newsapi.org/v2/top-headlines/sources?apiKey=f54ae9c9a80544068710a458090cae25"
         );
         const data = await response.json();
         const fetchedSources = data.sources.map((source: any) => ({
@@ -44,7 +44,7 @@ const Preferences: React.FC = () => {
     const fetchAuthors = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/everything?q=news&apiKey=65062e2270024cd5a94980583ac3ae30"
+          "https://newsapi.org/v2/everything?q=news&apiKey=f54ae9c9a80544068710a458090cae25"
         );
         const data = await response.json();
         const fetchedAuthors = [
