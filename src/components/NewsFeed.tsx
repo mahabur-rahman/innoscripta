@@ -7,6 +7,7 @@ import { Article } from "../interfaces/newsFeed.interface";
 import InfiniteScroll from "react-infinite-scroll-component";
 import moment, { Moment } from "moment";
 import { Skeleton } from "antd";
+import { useSelector } from "react-redux";
 
 const NEWS_API_KEY = "65062e2270024cd5a94980583ac3ae30";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
@@ -28,12 +29,47 @@ const normalizeArticle = (article: any, source: string): Article => {
 
 const NewsFeed: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
+  const [hasPreference, setHasPreference] = useState(false);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSource, setSelectedSource] = useState<string>("");
   const [dateRange, setDateRange] = useState<[Moment, Moment] | null>(null);
   const [category, setCategory] = useState<string | null>(null);
+
+  const preferences = useSelector((state: any) => state.preferences);
+
+  useEffect(() => {
+    // Fetch articles and set preferences
+    fetchArticles(page, searchQuery, selectedSource, dateRange, category);
+    // Check preferences
+    if (
+      preferences.selectedAuthors.length > 0 ||
+      preferences.selectedSources.length > 0 ||
+      preferences.selectedCategories.length > 0
+    ) {
+      setHasPreference(true);
+    }
+  }, [page, searchQuery, selectedSource, dateRange, category, preferences]);
+
+  useEffect(() => {
+    // Fetch and filter articles when preferences or articles change
+    if (hasPreference) {
+      FetchApiWithPreference();
+    }
+  }, [hasPreference, articles, preferences]);
+
+  const FetchApiWithPreference = async () => {
+    const selectedAuthors = preferences.selectedAuthors;
+
+    // Filter articles based on selected authors
+    const filteredArticles = articles.filter((article: Article) =>
+      selectedAuthors.includes(article.author)
+    );
+    setFilteredArticles(filteredArticles);
+    console.log("Filtered items are: ", filteredArticles);
+  };
 
   const fetchArticles = async (
     pageNumber: number,
@@ -129,10 +165,6 @@ const NewsFeed: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchArticles(page, searchQuery, selectedSource, dateRange, category);
-  }, [page, searchQuery, selectedSource, dateRange, category]);
-
   const handleSearch = (
     query: string,
     dateRange?: [Moment, Moment],
@@ -183,13 +215,19 @@ const NewsFeed: React.FC = () => {
       >
         {articles.length === 0 && !hasMore ? (
           <div className="my-8 text-center">
-            <h3  className="text-red-400">No articles found</h3>
+            <h3 className="text-red-400">No articles found</h3>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-            {articles.map((article) => (
-              <FeedCard key={article.url} article={article} />
-            ))}
+            {filteredArticles.length > 0 ? (
+              filteredArticles.map((article) => (
+                <FeedCard key={article.url} article={article} />
+              ))
+            ) : (
+              articles.map((article) => (
+                <FeedCard key={article.url} article={article} />
+              ))
+            )}
           </div>
         )}
       </InfiniteScroll>
