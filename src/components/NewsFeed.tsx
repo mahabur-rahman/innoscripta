@@ -9,7 +9,7 @@ import moment, { Moment } from "moment";
 import { Skeleton } from "antd";
 import { useSelector } from "react-redux";
 
-const NEWS_API_KEY = "f54ae9c9a80544068710a458090cae25";
+const NEWS_API_KEY = "d120bb75f00b4b088ffedfcc5bb4b1ad";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
 const NYT_API_URL = "https://api.nytimes.com/svc/topstories/v2/world.json";
 const NYT_API_KEY = "0XQveFRbsEVehGpaTz5ERNkmQLKfAd2q";
@@ -21,13 +21,13 @@ const normalizeArticle = (article: any, source: string): Article => {
       article.description || article.abstract || "No description available",
     url: article.url,
     urlToImage: article.urlToImage || article.multimedia?.[0]?.url || null,
-    source: source,
+    source,
     author: article.author || article.byline || "Unknown",
     publishedAt: article.publishedAt || article.created_date || "N/A",
   };
 };
 
-const NewsFeed: React.FC = () => {
+const NewsFeed = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
   const [hasPreference, setHasPreference] = useState(false);
@@ -40,6 +40,7 @@ const NewsFeed: React.FC = () => {
 
   const preferences = useSelector((state: any) => state.preferences);
 
+  console.log('filtered items are:', filteredArticles)
   useEffect(() => {
     fetchArticles(page, searchQuery, selectedSource, dateRange, category);
     if (
@@ -60,14 +61,33 @@ const NewsFeed: React.FC = () => {
   const FetchApiWithPreference = async () => {
     const selectedAuthors = preferences.selectedAuthors;
     const selectedSources = preferences.selectedSources;
-    const selectedCategories = preferences.selectedCategories;
-
-    const filteredArticles = articles.filter((article: Article) =>
+  
+    // Filter existing articles based on selected authors
+    const filteredByAuthors = articles.filter((article: Article) =>
       selectedAuthors.includes(article.author)
     );
-    setFilteredArticles(filteredArticles);
-    console.log("Filtered items are: ", filteredArticles);
+  
+    // Fetch new articles based on selected sources
+    if (selectedSources.length > 0) {
+      try {
+        const response = await axios.get(
+          `https://newsapi.org/v2/everything?q=general&apiKey=${NEWS_API_KEY}&page=1&pageSize=10&sources=${selectedSources.join(",")}`
+        );
+  
+        const sourceArticles = response.data.articles.map((article: any) =>
+          normalizeArticle(article, "NewsAPI")
+        );
+  
+        // Combine filtered articles with newly fetched source-based articles
+        setFilteredArticles([...filteredByAuthors, ...sourceArticles]);
+      } catch (error) {
+        console.error("Error fetching articles by sources:", error);
+      }
+    } else {
+      setFilteredArticles(filteredByAuthors);
+    }
   };
+  
 
   const fetchArticles = async (
     pageNumber: number,
@@ -186,6 +206,7 @@ const NewsFeed: React.FC = () => {
     setPage((prevPage) => prevPage + 1);
   };
 
+  // console.log('all articles:', articles)
   return (
     <>
       <NewsFeedWidget
@@ -222,10 +243,10 @@ const NewsFeed: React.FC = () => {
               ))
             ) : (
               articles.map((article) => (
-                <FeedCard key={article.url} article={article} />
+                <FeedCard key={article.url} article={article} />                
               ))
             )}
-          </div>
+          </div>     
         )}
       </InfiniteScroll>
     </>

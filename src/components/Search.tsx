@@ -26,7 +26,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
     const fetchSources = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines/sources?apiKey=f54ae9c9a80544068710a458090cae25"
+          "https://newsapi.org/v2/top-headlines/sources?apiKey=d120bb75f00b4b088ffedfcc5bb4b1ad"
         );
         const data = await response.json();
 
@@ -113,6 +113,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
           placeholder="Select sources..."
           onChange={handleSourceChange}
         />
+        
         <RangePicker className="w-full h-12" onChange={handleDateRangeChange} />
       </div>
     </>
