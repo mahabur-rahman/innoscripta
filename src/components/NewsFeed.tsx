@@ -41,9 +41,7 @@ const NewsFeed: React.FC = () => {
   const preferences = useSelector((state: any) => state.preferences);
 
   useEffect(() => {
-    // Fetch articles and set preferences
     fetchArticles(page, searchQuery, selectedSource, dateRange, category);
-    // Check preferences
     if (
       preferences.selectedAuthors.length > 0 ||
       preferences.selectedSources.length > 0 ||
@@ -54,7 +52,6 @@ const NewsFeed: React.FC = () => {
   }, [page, searchQuery, selectedSource, dateRange, category, preferences]);
 
   useEffect(() => {
-    // Fetch and filter articles when preferences or articles change
     if (hasPreference) {
       FetchApiWithPreference();
     }
@@ -62,8 +59,9 @@ const NewsFeed: React.FC = () => {
 
   const FetchApiWithPreference = async () => {
     const selectedAuthors = preferences.selectedAuthors;
+    const selectedSources = preferences.selectedSources;
+    const selectedCategories = preferences.selectedCategories;
 
-    // Filter articles based on selected authors
     const filteredArticles = articles.filter((article: Article) =>
       selectedAuthors.includes(article.author)
     );
@@ -115,7 +113,6 @@ const NewsFeed: React.FC = () => {
           normalizeArticle(article, "NewsAPI")
         );
       } else if (query === "") {
-        // Fetch from both APIs if the query is empty
         const [nytResponse, newsResponse] = await Promise.all([
           axios.get(NYT_API_URL, { params: { "api-key": NYT_API_KEY } }),
           axios.get(NEWS_BASE_URL, {
