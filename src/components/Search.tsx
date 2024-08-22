@@ -26,7 +26,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
     const fetchSources = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines/sources?apiKey=7554fe672fd243e1baa7656749b97f5d"
+          "https://newsapi.org/v2/top-headlines/sources?apiKey=65062e2270024cd5a94980583ac3ae30"
         );
         const data = await response.json();
 

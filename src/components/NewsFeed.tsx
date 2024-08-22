@@ -8,7 +8,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import moment, { Moment } from "moment";
 import { Skeleton } from "antd";
 
-const NEWS_API_KEY = "7554fe672fd243e1baa7656749b97f5d";
+const NEWS_API_KEY = "65062e2270024cd5a94980583ac3ae30";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
 const NYT_API_URL = "https://api.nytimes.com/svc/topstories/v2/world.json";
 const NYT_API_KEY = "0XQveFRbsEVehGpaTz5ERNkmQLKfAd2q";
