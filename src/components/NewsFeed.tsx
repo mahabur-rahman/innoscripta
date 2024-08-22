@@ -40,7 +40,8 @@ const NewsFeed = () => {
 
   const preferences = useSelector((state: any) => state.preferences);
 
-  console.log('filtered items are:', filteredArticles)
+  // console.log('filtered items are:', filteredArticles)
+
   useEffect(() => {
     fetchArticles(page, searchQuery, selectedSource, dateRange, category);
     if (
@@ -58,35 +59,68 @@ const NewsFeed = () => {
     }
   }, [hasPreference, articles, preferences]);
 
-  const FetchApiWithPreference = async () => {
-    const selectedAuthors = preferences.selectedAuthors;
-    const selectedSources = preferences.selectedSources;
-  
-    // Filter existing articles based on selected authors
-    const filteredByAuthors = articles.filter((article: Article) =>
-      selectedAuthors.includes(article.author)
-    );
-  
-    // Fetch new articles based on selected sources
-    if (selectedSources.length > 0) {
-      try {
-        const response = await axios.get(
-          `https://newsapi.org/v2/everything?q=general&apiKey=${NEWS_API_KEY}&page=1&pageSize=10&sources=${selectedSources.join(",")}`
-        );
-  
-        const sourceArticles = response.data.articles.map((article: any) =>
-          normalizeArticle(article, "NewsAPI")
-        );
-  
-        // Combine filtered articles with newly fetched source-based articles
-        setFilteredArticles([...filteredByAuthors, ...sourceArticles]);
-      } catch (error) {
-        console.error("Error fetching articles by sources:", error);
-      }
-    } else {
-      setFilteredArticles(filteredByAuthors);
+const FetchApiWithPreference = async () => {
+  const { selectedAuthors, selectedSources, selectedCategories } = preferences;
+
+  // Filter existing articles by selected authors
+  let filteredByPreferences = articles.filter((article: Article) =>
+    selectedAuthors.includes(article.author)
+  );
+
+  // Fetch articles by selected sources
+  if (selectedSources.length > 0) {
+    try {
+      const response = await axios.get(
+        `https://newsapi.org/v2/everything?q=general&apiKey=${NEWS_API_KEY}&page=1&pageSize=10&sources=${selectedSources.join(",")}`
+      );
+
+      const sourceArticles = response.data.articles.map((article: any) =>
+        normalizeArticle(article, "NewsAPI")
+      );
+
+      filteredByPreferences = [...filteredByPreferences, ...sourceArticles];
+    } catch (error) {
+      console.error("Error fetching articles by sources:", error);
     }
-  };
+  }
+
+  // Fetch articles by selected categories
+  if (selectedCategories.length > 0) {
+    try {
+      const categoryRequests = selectedCategories.map((category: string) =>
+        axios.get("https://newsapi.org/v2/top-headlines", {
+          params: {
+            category,
+            apiKey: NEWS_API_KEY,
+            page: 1,
+            pageSize: 10,
+          },
+        })
+      );
+
+      const categoryResponses = await Promise.all(categoryRequests);
+      const categoryArticles = categoryResponses.flatMap((response: AxiosResponse) =>
+        response.data.articles.map((article: any) =>
+          normalizeArticle(article, "NewsAPI")
+        )
+      );
+
+      filteredByPreferences = [...filteredByPreferences, ...categoryArticles];
+    } catch (error) {
+      console.error("Error fetching articles by categories:", error);
+    }
+  }
+
+  // Remove duplicates by URL
+  const uniqueArticles = filteredByPreferences.filter(
+    (article, index, self) =>
+      index === self.findIndex((a) => a.url === article.url)
+  );
+
+  setFilteredArticles(uniqueArticles);
+};
+
+  
   
 
   const fetchArticles = async (
