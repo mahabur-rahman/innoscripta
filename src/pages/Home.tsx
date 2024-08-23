@@ -46,13 +46,13 @@ const Home = () => {
       <Helmet>
         <title>Latest News - Breaking News, Sports, Business..</title>
       </Helmet>
-      <div className="grid grid-cols-1 gap-4 mt-24 2xl:mt-32 md:grid-cols-12 lg:px-4">
-        <div className="md:col-span-9">
+      <div className="grid grid-cols-1 gap-4 px-4 mt-24 2xl:mt-32 md:grid-cols-12">
+        <div className="col-span-12 xl:col-span-9">
           <NewsFeed />
         </div>
 
-        <div className="p-4 md:col-span-3 xl:p-0">
-          <div className="bottom-0 w-1/4 h-screen pb-4 overflow-y-scroll 2xl:pb-4 xl:right-0 xl:fixed top-4">
+        <div className="col-span-12 p-4 xl:col-span-3">
+          <div className="bottom-0 w-full h-screen pb-4 overflow-y-scroll xl:w-1/4 2xl:pb-4 xl:right-0 xl:fixed top-4">
             <h4 className="pt-24 mb-0 text-2xl font-bold text-red-400 capitalize 2xl:pt-32">
               Breaking news
             </h4>
