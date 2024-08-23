@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Input, Select, DatePicker, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import type { SelectProps } from "antd";
-import moment, { Moment } from "moment";
+import { Moment } from "moment";
 import { newsApiCategories } from "../data/data";
+import { FetchSourcesResponse, Source } from "../interfaces/newsFeed.interface";
 const { RangePicker } = DatePicker;
 
 interface SearchBarProps {
@@ -15,10 +16,9 @@ interface SearchBarProps {
   onSourceChange: (source: string) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
+const SearchBar = ({ onSearch, onSourceChange }: SearchBarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sources, setSources] = useState<SelectProps["options"]>([]);
-  const [selectedSource, setSelectedSource] = useState<string>("");
   const [dateRange, setDateRange] = useState<[Moment, Moment] | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -28,10 +28,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
         const response = await fetch(
           "https://newsapi.org/v2/top-headlines/sources?apiKey=81d68563bb4c45c19b40012b315e9a1b"
         );
-        const data = await response.json();
+        const data: FetchSourcesResponse = await response.json();
 
         if (data.status === "ok") {
-          const sourceOptions = data.sources.map((source: any) => ({
+          const sourceOptions = data.sources.map((source: Source) => ({
             value: source.id,
             label: source.name,
           }));
@@ -39,8 +39,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
         } else {
           message.error("Failed to fetch sources");
         }
-      } catch (error) {
-        message.error("An error occurred while fetching sources");
+      } catch (err) {
+        console.log(err);
       }
     };
 
@@ -52,8 +52,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
   };
 
   const handleSearchClick = () => {
-    onSearch(searchQuery, dateRange, selectedCategory);
-    setSearchQuery('')
+    onSearch(
+      searchQuery,
+      dateRange ?? undefined,
+      selectedCategory ?? undefined
+    );
+    setSearchQuery("");
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -63,18 +67,21 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
   };
 
   const handleSourceChange = (value: string) => {
-    setSelectedSource(value);
     onSourceChange(value);
   };
 
   const handleDateRangeChange = (dates: [Moment, Moment] | null) => {
     setDateRange(dates as [Moment, Moment]);
-    onSearch(searchQuery, dates as [Moment, Moment], selectedCategory);
+    onSearch(
+      searchQuery,
+      dates as [Moment, Moment],
+      selectedCategory ?? undefined
+    );
   };
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
-    onSearch(searchQuery, dateRange, category);
+    onSearch(searchQuery, dateRange ?? undefined, category);
   };
 
   return (
@@ -113,7 +120,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSourceChange }) => {
           placeholder="Select sources..."
           onChange={handleSourceChange}
         />
-        
+
         <RangePicker className="w-full h-12" onChange={handleDateRangeChange} />
       </div>
     </>
