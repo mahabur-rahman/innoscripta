@@ -1,7 +1,7 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
-import preferencesReducer from './preferencesSlice';
-import persistConfig from '../utils/persist.config';
+import { configureStore } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from "redux-persist";
+import preferencesReducer from "./preferencesSlice";
+import persistConfig from "../utils/persist.config";
 
 const persistedReducer = persistReducer(persistConfig, preferencesReducer);
 

@@ -35,7 +35,7 @@ const Preferences = () => {
     const fetchSources = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines/sources?apiKey=12ab0f65032548618c53df03204e1026"
+          "https://newsapi.org/v2/top-headlines/sources?apiKey=ac33d88f4fb847b59c40282e5e7218d0"
         );
         const data: SourceResponse = await response.json();
         const fetchedSources = data.sources;
@@ -54,7 +54,7 @@ const Preferences = () => {
     const fetchAuthors = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/everything?q=news&apiKey=12ab0f65032548618c53df03204e1026"
+          "https://newsapi.org/v2/everything?q=news&apiKey=ac33d88f4fb847b59c40282e5e7218d0"
         );
         const data: AuthorResponse = await response.json();
         const fetchedAuthors = [

@@ -13,7 +13,7 @@ const Footer = () => {
         <div className="flex items-center justify-center mt-4 space-x-4 sm:mt-0">
           {socialLinks.map((item) => (
             <a
-            key={item.id}
+              key={item.id}
               href={item.url}
               target="_blank"
               className="text-gray-500 transition-colors duration-300 hover:text-deep-purple-accent-400"

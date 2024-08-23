@@ -42,7 +42,7 @@ const Home: React.FC = () => {
   return (
     <>
       <Helmet>
-      <title>Latest News - Breaking News, Sports, Business..</title>
+        <title>Latest News - Breaking News, Sports, Business..</title>
       </Helmet>
       <div className="grid grid-cols-1 gap-4 mt-24 2xl:mt-32 md:grid-cols-12 lg:px-4">
         <div className="md:col-span-9">

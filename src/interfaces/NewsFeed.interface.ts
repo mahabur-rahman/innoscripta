@@ -40,8 +40,6 @@ export interface NewsFeedWidgetProps {
   content: string;
 }
 
-
-
 export interface Source {
   id: string;
   name: string;

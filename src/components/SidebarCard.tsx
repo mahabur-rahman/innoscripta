@@ -15,7 +15,9 @@ const SidebarCard = ({ item }: SidebarCardProps) => {
             </h5>
             <div className="relative pr-8">
               <p className="mb-2 text-sm text-gray-700">{item.webTitle}</p>
-              <p className="mb-2 text-xs text-gray-500">Published on: {formattedDate}</p>
+              <p className="mb-2 text-xs text-gray-500">
+                Published on: {formattedDate}
+              </p>
               <a
                 href={item.webUrl}
                 target="_blank"

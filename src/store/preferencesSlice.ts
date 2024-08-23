@@ -1,10 +1,9 @@
-// src/store/preferencesSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface PreferencesState {
-  selectedAuthors: string[]; // Store only names of selected authors
-  selectedSources: string[]; // Store only IDs of selected sources
-  selectedCategories: string[]; // Store only category names
+  selectedAuthors: string[];
+  selectedSources: string[];
+  selectedCategories: string[];
 }
 
 const initialState: PreferencesState = {
@@ -14,7 +13,7 @@ const initialState: PreferencesState = {
 };
 
 const preferencesSlice = createSlice({
-  name: 'preferences',
+  name: "preferences",
   initialState,
   reducers: {
     toggleAuthor: (state, action: PayloadAction<string>) => {
@@ -44,5 +43,6 @@ const preferencesSlice = createSlice({
   },
 });
 
-export const { toggleAuthor, toggleSource, toggleCategory } = preferencesSlice.actions;
+export const { toggleAuthor, toggleSource, toggleCategory } =
+  preferencesSlice.actions;
 export default preferencesSlice.reducer;

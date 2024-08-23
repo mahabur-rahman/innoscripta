@@ -1,5 +1,3 @@
-
-
 export interface Author {
   name: string;
   checked: boolean;
