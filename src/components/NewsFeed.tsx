@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios, { AxiosResponse } from "axios";
 import FeedCard from "./FeedCard";
 import NewsFeedWidget from "../common/NewsFeedWidget";
 import SearchBar from "./Search";
 import { Article } from "../interfaces/newsFeed.interface";
 import InfiniteScroll from "react-infinite-scroll-component";
-import moment, { Moment } from "moment";
+import { Moment } from "moment";
 import { Skeleton } from "antd";
 import { useSelector } from "react-redux";
 
-const NEWS_API_KEY = "81d68563bb4c45c19b40012b315e9a1b";
+const NEWS_API_KEY = "12ab0f65032548618c53df03204e1026";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
 const NYT_API_URL = "https://api.nytimes.com/svc/topstories/v2/world.json";
 const NYT_API_KEY = "0XQveFRbsEVehGpaTz5ERNkmQLKfAd2q";
@@ -40,10 +40,14 @@ const NewsFeed = () => {
 
   const preferences = useSelector((state: any) => state.preferences);
 
-  // console.log('filtered items are:', filteredArticles)
-
   useEffect(() => {
-    fetchArticles(page, searchQuery, selectedSource, dateRange, category);
+    fetchArticles(
+      page,
+      searchQuery,
+      selectedSource,
+      dateRange ?? undefined,
+      category || ""
+    );
     if (
       preferences.selectedAuthors.length > 0 ||
       preferences.selectedSources.length > 0 ||
@@ -59,69 +63,66 @@ const NewsFeed = () => {
     }
   }, [hasPreference, articles, preferences]);
 
-const FetchApiWithPreference = async () => {
-  const { selectedAuthors, selectedSources, selectedCategories } = preferences;
+  const FetchApiWithPreference = async () => {
+    const { selectedAuthors, selectedSources, selectedCategories } =
+      preferences;
 
-  // Filter existing articles by selected authors
-  let filteredByPreferences = articles.filter((article: Article) =>
-    selectedAuthors.includes(article.author)
-  );
+    let filteredByPreferences = articles.filter((article: Article) =>
+      selectedAuthors.includes(article.author)
+    );
 
-  // Fetch articles by selected sources
-  if (selectedSources.length > 0) {
-    try {
-      const response = await axios.get(
-        `https://newsapi.org/v2/everything?q=general&apiKey=${NEWS_API_KEY}&page=1&pageSize=10&sources=${selectedSources.join(",")}`
-      );
+    if (selectedSources.length > 0) {
+      try {
+        const response = await axios.get(
+          `https://newsapi.org/v2/everything?q=general&apiKey=${NEWS_API_KEY}&page=1&pageSize=10&sources=${selectedSources.join(
+            ","
+          )}`
+        );
 
-      const sourceArticles = response.data.articles.map((article: any) =>
-        normalizeArticle(article, "NewsAPI")
-      );
-
-      filteredByPreferences = [...filteredByPreferences, ...sourceArticles];
-    } catch (error) {
-      console.error("Error fetching articles by sources:", error);
-    }
-  }
-
-  // Fetch articles by selected categories
-  if (selectedCategories.length > 0) {
-    try {
-      const categoryRequests = selectedCategories.map((category: string) =>
-        axios.get("https://newsapi.org/v2/top-headlines", {
-          params: {
-            category,
-            apiKey: NEWS_API_KEY,
-            page: 1,
-            pageSize: 10,
-          },
-        })
-      );
-
-      const categoryResponses = await Promise.all(categoryRequests);
-      const categoryArticles = categoryResponses.flatMap((response: AxiosResponse) =>
-        response.data.articles.map((article: any) =>
+        const sourceArticles = response.data.articles.map((article: any) =>
           normalizeArticle(article, "NewsAPI")
-        )
-      );
+        );
 
-      filteredByPreferences = [...filteredByPreferences, ...categoryArticles];
-    } catch (error) {
-      console.error("Error fetching articles by categories:", error);
+        filteredByPreferences = [...filteredByPreferences, ...sourceArticles];
+      } catch (error) {
+        console.error("Error fetching articles by sources:", error);
+      }
     }
-  }
 
-  // Remove duplicates by URL
-  const uniqueArticles = filteredByPreferences.filter(
-    (article, index, self) =>
-      index === self.findIndex((a) => a.url === article.url)
-  );
+    if (selectedCategories.length > 0) {
+      try {
+        const categoryRequests = selectedCategories.map((category: string) =>
+          axios.get("https://newsapi.org/v2/top-headlines", {
+            params: {
+              category,
+              apiKey: NEWS_API_KEY,
+              page: 1,
+              pageSize: 10,
+            },
+          })
+        );
 
-  setFilteredArticles(uniqueArticles);
-};
+        const categoryResponses = await Promise.all(categoryRequests);
+        const categoryArticles = categoryResponses.flatMap(
+          (response: AxiosResponse) =>
+            response.data.articles.map((article: any) =>
+              normalizeArticle(article, "NewsAPI")
+            )
+        );
 
-  
-  
+        filteredByPreferences = [...filteredByPreferences, ...categoryArticles];
+      } catch (error) {
+        console.error("Error fetching articles by categories:", error);
+      }
+    }
+
+    const uniqueArticles = filteredByPreferences.filter(
+      (article, index, self) =>
+        index === self.findIndex((a) => a.url === article.url)
+    );
+
+    setFilteredArticles(uniqueArticles);
+  };
 
   const fetchArticles = async (
     pageNumber: number,
@@ -148,6 +149,7 @@ const FetchApiWithPreference = async () => {
           },
         });
         const newsArticles = response.data.articles;
+
         newArticles = newsArticles.map((article: any) =>
           normalizeArticle(article, "NewsAPI")
         );
@@ -163,6 +165,7 @@ const FetchApiWithPreference = async () => {
           },
         });
         const newsArticles = response.data.articles;
+
         newArticles = newsArticles.map((article: any) =>
           normalizeArticle(article, "NewsAPI")
         );
@@ -187,6 +190,7 @@ const FetchApiWithPreference = async () => {
           ...nytArticles.map((article: any) =>
             normalizeArticle(article, "New York Times")
           ),
+
           ...newsArticles.map((article: any) =>
             normalizeArticle(article, "NewsAPI")
           ),
@@ -202,6 +206,7 @@ const FetchApiWithPreference = async () => {
           },
         });
         const newsArticles = response.data.articles;
+
         newArticles = newsArticles.map((article: any) =>
           normalizeArticle(article, "NewsAPI")
         );
@@ -233,14 +238,19 @@ const FetchApiWithPreference = async () => {
     setSelectedSource(source);
     setPage(1);
     setArticles([]);
-    fetchArticles(1, searchQuery, source, dateRange, category);
+    fetchArticles(
+      1,
+      searchQuery,
+      source,
+      dateRange ?? undefined,
+      category || ""
+    );
   };
 
   const loadMoreArticles = () => {
     setPage((prevPage) => prevPage + 1);
   };
 
-  // console.log('all articles:', articles)
   return (
     <>
       <NewsFeedWidget
@@ -271,16 +281,14 @@ const FetchApiWithPreference = async () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-            {filteredArticles.length > 0 ? (
-              filteredArticles.map((article) => (
-                <FeedCard key={article.url} article={article} />
-              ))
-            ) : (
-              articles.map((article) => (
-                <FeedCard key={article.url} article={article} />                
-              ))
-            )}
-          </div>     
+            {filteredArticles.length > 0
+              ? filteredArticles.map((article) => (
+                  <FeedCard key={article.url} article={article} />
+                ))
+              : articles.map((article) => (
+                  <FeedCard key={article.url} article={article} />
+                ))}
+          </div>
         )}
       </InfiniteScroll>
     </>

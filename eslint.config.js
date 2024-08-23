@@ -19,6 +19,7 @@ export default tseslint.config(
     },
     rules: {
       "react/prop-types": "off",
+        "@typescript-eslint/no-explicit-any": "off",
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
