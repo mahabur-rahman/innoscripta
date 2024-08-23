@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, KeyboardEvent, ChangeEvent } from "react";
 import { Input, Select, DatePicker, message } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import type { SelectProps } from "antd";
-import { Moment } from "moment";
 import { newsApiCategories } from "../data/data";
 import { FetchSourcesResponse, Source } from "../interfaces/newsFeed.interface";
+import { Moment } from "moment";
+import { RangePickerProps } from "antd/es/date-picker";
 const { RangePicker } = DatePicker;
 
 interface SearchBarProps {
@@ -47,7 +48,7 @@ const SearchBar = ({ onSearch, onSourceChange }: SearchBarProps) => {
     fetchSources();
   }, []);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
 
@@ -60,7 +61,7 @@ const SearchBar = ({ onSearch, onSourceChange }: SearchBarProps) => {
     setSearchQuery("");
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       handleSearchClick();
     }
@@ -70,11 +71,11 @@ const SearchBar = ({ onSearch, onSourceChange }: SearchBarProps) => {
     onSourceChange(value);
   };
 
-  const handleDateRangeChange = (dates: [Moment, Moment] | null) => {
-    setDateRange(dates as [Moment, Moment]);
+  const handleDateRangeChange: RangePickerProps["onChange"] = (dates) => {
+    setDateRange(dates as [Moment, Moment] | null);
     onSearch(
       searchQuery,
-      dates as [Moment, Moment],
+      dates as [Moment, Moment] | undefined,
       selectedCategory ?? undefined
     );
   };
