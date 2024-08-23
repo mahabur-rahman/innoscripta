@@ -298,7 +298,7 @@ const NewsFeed = () => {
         next={loadMoreArticles}
         hasMore={hasMore}
         loader={
-          <div className="grid grid-cols-1 gap-4 mx-3 mb-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 mx-3 mb-6 sm:grid-cols-2 md:grid-cols-3">
             <Skeleton
               className="mb-4 rounded-lg h-60"
               active
@@ -317,7 +317,7 @@ const NewsFeed = () => {
           </div>
         }
       >
-        <div className="grid grid-cols-1 gap-4 mx-3 mb-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 mx-3 mb-6 sm:grid-cols-2 md:grid-cols-3">
           {searchQuery || selectedSource || dateRange || !hasPreference
             ? articles.map((article: Article, index: number) => (
                 <FeedCard key={index} article={article} />
