@@ -1,37 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { Button, Checkbox, List } from "antd";
+import { useEffect, useState } from "react";
+import { Checkbox, List } from "antd";
 import NewsFeedWidget from "../common/NewsFeedWidget";
 import { Helmet } from "react-helmet";
-import { SaveOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { toggleAuthor, toggleSource, toggleCategory } from "../store/preferencesSlice";
+import {
+  toggleAuthor,
+  toggleSource,
+  toggleCategory,
+} from "../store/preferencesSlice";
+import {
+  AuthorResponse,
+  Source,
+  SourceResponse,
+} from "../interfaces/preferences.interface";
 
-const Preferences: React.FC = () => {
+const Preferences = () => {
   const dispatch = useDispatch();
-  const selectedAuthors = useSelector((state: RootState) => state.preferences.selectedAuthors);
-  const selectedSources = useSelector((state: RootState) => state.preferences.selectedSources);
-  const selectedCategories = useSelector((state: RootState) => state.preferences.selectedCategories);
+  const selectedAuthors = useSelector(
+    (state: RootState) => state.preferences.selectedAuthors
+  );
+  const selectedSources = useSelector(
+    (state: RootState) => state.preferences.selectedSources
+  );
+  const selectedCategories = useSelector(
+    (state: RootState) => state.preferences.selectedCategories
+  );
 
   const [authors, setAuthors] = useState<string[]>([]);
-  const [sources, setSources] = useState<{ id: string; name: string }[]>([]);
+  const [sources, setSources] = useState<Source[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchSources = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines/sources?apiKey=d120bb75f00b4b088ffedfcc5bb4b1ad"
+          "https://newsapi.org/v2/top-headlines/sources?apiKey=81d68563bb4c45c19b40012b315e9a1b"
         );
-        const data = await response.json();
-        const fetchedSources = data.sources.map((source: any) => ({
-          id: source.id,
-          name: source.name,
-          category: source.category,
-        }));
+        const data: SourceResponse = await response.json();
+        const fetchedSources = data.sources;
 
         const uniqueCategories = [
-          ...new Set(fetchedSources.map((source: any) => source.category)),
+          ...new Set(fetchedSources.map((source) => source.category)),
         ];
 
         setSources(fetchedSources);
@@ -44,11 +54,15 @@ const Preferences: React.FC = () => {
     const fetchAuthors = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/everything?q=news&apiKey=d120bb75f00b4b088ffedfcc5bb4b1ad"
+          "https://newsapi.org/v2/everything?q=news&apiKey=81d68563bb4c45c19b40012b315e9a1b"
         );
-        const data = await response.json();
+        const data: AuthorResponse = await response.json();
         const fetchedAuthors = [
-          ...new Set(data.articles.map((article: any) => article.author).filter(Boolean)),
+          ...new Set(
+            data.articles
+              .map((article) => article.author)
+              .filter(Boolean) as string[]
+          ),
         ];
 
         setAuthors(fetchedAuthors);
@@ -81,9 +95,11 @@ const Preferences: React.FC = () => {
       <div className="container p-4 mx-auto mt-24">
         <NewsFeedWidget
           pageTitle={"Preferences"}
-          content={"Modify your settings to enhance and personalize your experience here."}
+          content={
+            "Modify your settings to enhance and personalize your experience here."
+          }
         />
-      
+
         <div className="grid w-full grid-cols-3 gap-4 mt-4">
           <div>
             <h3 className="text-lg font-semibold">Authors</h3>
@@ -91,7 +107,7 @@ const Preferences: React.FC = () => {
             <List
               className="mt-4"
               bordered
-              dataSource={authors.filter(Boolean)} 
+              dataSource={authors}
               renderItem={(author) => (
                 <List.Item key={author}>
                   <Checkbox

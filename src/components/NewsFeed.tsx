@@ -9,7 +9,7 @@ import moment, { Moment } from "moment";
 import { Skeleton } from "antd";
 import { useSelector } from "react-redux";
 
-const NEWS_API_KEY = "d120bb75f00b4b088ffedfcc5bb4b1ad";
+const NEWS_API_KEY = "81d68563bb4c45c19b40012b315e9a1b";
 const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
 const NYT_API_URL = "https://api.nytimes.com/svc/topstories/v2/world.json";
 const NYT_API_KEY = "0XQveFRbsEVehGpaTz5ERNkmQLKfAd2q";
