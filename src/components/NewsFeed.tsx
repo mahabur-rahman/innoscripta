@@ -36,13 +36,6 @@ const NewsFeed = () => {
   const preferences = useSelector((state: any) => state.preferences);
 
   useEffect(() => {
-    fetchArticles(
-      page,
-      searchQuery,
-      selectedSource,
-      dateRange ?? undefined,
-      category || ""
-    );
     if (
       preferences.selectedAuthors.length > 0 ||
       preferences.selectedSources.length > 0 ||
@@ -50,21 +43,62 @@ const NewsFeed = () => {
     ) {
       setHasPreference(true);
     }
-  }, [page, searchQuery, selectedSource, dateRange, category, preferences]);
+  }, [preferences]);
 
   useEffect(() => {
-    if (hasPreference) {
-      FetchApiWithPreference();
+    if (searchQuery || selectedSource || dateRange) {
+      fetchArticles(
+        1,
+        searchQuery,
+        selectedSource,
+        dateRange ?? undefined,
+        category ?? undefined
+      );
+    } else if (hasPreference) {
+      fetchArticlesWithPreference();
+    } else {
+      fetchArticles(
+        page,
+        searchQuery,
+        selectedSource,
+        dateRange ?? undefined,
+        category ?? undefined
+      );
     }
-  }, [hasPreference, articles, preferences]);
+  }, [page, searchQuery, selectedSource, dateRange, category, hasPreference]);
 
-  const FetchApiWithPreference = async () => {
+  const fetchArticlesWithPreference = async () => {
     const { selectedAuthors, selectedSources, selectedCategories } =
       preferences;
 
-    let filteredByPreferences = articles.filter((article: Article) =>
-      selectedAuthors.includes(article.author)
-    );
+    let filteredByPreferences: Article[] = [];
+
+    if (selectedAuthors.length > 0) {
+      try {
+        const authorRequests = selectedAuthors.map((author: string) =>
+          axios.get(`${import.meta.env.VITE_NEWS_BASE_URL}`, {
+            params: {
+              q: author,
+              apiKey: import.meta.env.VITE_NEWS_API_KEY,
+              page: 1,
+              pageSize: 10,
+            },
+          })
+        );
+
+        const authorResponses = await Promise.all(authorRequests);
+        const authorArticles = authorResponses.flatMap(
+          (response: AxiosResponse) =>
+            response.data.articles.map((article: any) =>
+              normalizeArticle(article, "NewsAPI")
+            )
+        );
+
+        filteredByPreferences = [...filteredByPreferences, ...authorArticles];
+      } catch (error) {
+        console.error("Error fetching articles by authors:", error);
+      }
+    }
 
     if (selectedSources.length > 0) {
       try {
@@ -190,7 +224,6 @@ const NewsFeed = () => {
           ...nytArticles.map((article: any) =>
             normalizeArticle(article, "New York Times")
           ),
-
           ...newsArticles.map((article: any) =>
             normalizeArticle(article, "NewsAPI")
           ),
@@ -265,31 +298,34 @@ const NewsFeed = () => {
         next={loadMoreArticles}
         hasMore={hasMore}
         loader={
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-            <Skeleton />
-            <Skeleton />
-            <Skeleton />
-            <Skeleton className="my-12" />
-            <Skeleton className="my-12" />
-            <Skeleton className="my-12" />
+          <div className="grid grid-cols-1 gap-4 mx-3 mb-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
+            <Skeleton
+              className="mb-4 rounded-lg h-60"
+              active
+              paragraph={{ rows: 4 }}
+            />
+            <Skeleton
+              className="mb-4 rounded-lg h-60"
+              active
+              paragraph={{ rows: 4 }}
+            />
+            <Skeleton
+              className="mb-4 rounded-lg h-60"
+              active
+              paragraph={{ rows: 4 }}
+            />
           </div>
         }
       >
-        {articles.length === 0 && !hasMore ? (
-          <div className="my-8 text-center">
-            <h3 className="text-red-400">No articles found</h3>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-            {filteredArticles.length > 0
-              ? filteredArticles.map((article) => (
-                  <FeedCard key={article.url} article={article} />
-                ))
-              : articles.map((article) => (
-                  <FeedCard key={article.url} article={article} />
-                ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 gap-4 mx-3 mb-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
+          {searchQuery || selectedSource || dateRange || !hasPreference
+            ? articles.map((article: Article, index: number) => (
+                <FeedCard key={index} article={article} />
+              ))
+            : filteredArticles.map((article: Article, index: number) => (
+                <FeedCard key={index} article={article} />
+              ))}
+        </div>
       </InfiniteScroll>
     </>
   );
