@@ -7,9 +7,9 @@ import { Pagination, Skeleton, Alert } from "antd";
 import { Helmet } from "react-helmet";
 
 const API_ENDPOINT =
-  "https://content.guardianapis.com/search?q=football&pageSize=10&page=";
+  `${import.meta.env.VITE_GUARDIAN_API_URL}/search?q=football&pageSize=10&page=`;
 
-const Home: React.FC = () => {
+const Home = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -19,7 +19,9 @@ const Home: React.FC = () => {
     const fetchData = async (page: number) => {
       try {
         const response = await axios.get<ApiResponse>(
-          `${API_ENDPOINT}${page}&api-key=c0fc8bd3-b90b-4c16-af84-91fbdf3a313a`
+          `${API_ENDPOINT}${page}&api-key=${
+            import.meta.env.VITE_GUARDIAN_API_KEY
+          }`
         );
         setNews(response.data.response?.results);
         setTotalPages(Math.ceil(response?.data?.response?.total / 10));

@@ -9,11 +9,6 @@ import { Moment } from "moment";
 import { Skeleton } from "antd";
 import { useSelector } from "react-redux";
 
-const NEWS_API_KEY = "ac33d88f4fb847b59c40282e5e7218d0";
-const NEWS_BASE_URL = "https://newsapi.org/v2/everything";
-const NYT_API_URL = "https://api.nytimes.com/svc/topstories/v2/world.json";
-const NYT_API_KEY = "0XQveFRbsEVehGpaTz5ERNkmQLKfAd2q";
-
 const normalizeArticle = (article: any, source: string): Article => {
   return {
     title: article.title,
@@ -74,9 +69,9 @@ const NewsFeed = () => {
     if (selectedSources.length > 0) {
       try {
         const response = await axios.get(
-          `https://newsapi.org/v2/everything?q=general&apiKey=${NEWS_API_KEY}&page=1&pageSize=10&sources=${selectedSources.join(
-            ","
-          )}`
+          `${import.meta.env.VITE_NEWS_BASE_URL}?q=general&apiKey=${
+            import.meta.env.VITE_NEWS_API_KEY
+          }&page=1&pageSize=10&sources=${selectedSources.join(",")}`
         );
 
         const sourceArticles = response.data.articles.map((article: any) =>
@@ -92,10 +87,10 @@ const NewsFeed = () => {
     if (selectedCategories.length > 0) {
       try {
         const categoryRequests = selectedCategories.map((category: string) =>
-          axios.get("https://newsapi.org/v2/top-headlines", {
+          axios.get(`${import.meta.env.VITE_NEW_API_HEADLINE_URL}`, {
             params: {
               category,
-              apiKey: NEWS_API_KEY,
+              apiKey: import.meta.env.VITE_NEWS_API_KEY,
               page: 1,
               pageSize: 10,
             },
@@ -139,25 +134,28 @@ const NewsFeed = () => {
       const toDate = dateRange ? dateRange[1].format("YYYY-MM-DD") : "";
 
       if (category) {
-        response = await axios.get("https://newsapi.org/v2/top-headlines", {
-          params: {
-            category: category,
-            apiKey: NEWS_API_KEY,
-            page: pageNumber,
-            pageSize: 10,
-            ...(fromDate && toDate && { from: fromDate, to: toDate }),
-          },
-        });
+        response = await axios.get(
+          `${import.meta.env.VITE_NEW_API_HEADLINE_URL}`,
+          {
+            params: {
+              category: category,
+              apiKey: import.meta.env.VITE_NEWS_API_KEY,
+              page: pageNumber,
+              pageSize: 10,
+              ...(fromDate && toDate && { from: fromDate, to: toDate }),
+            },
+          }
+        );
         const newsArticles = response.data.articles;
 
         newArticles = newsArticles.map((article: any) =>
           normalizeArticle(article, "NewsAPI")
         );
       } else if (source) {
-        response = await axios.get(NEWS_BASE_URL, {
+        response = await axios.get(import.meta.env.VITE_NEWS_BASE_URL, {
           params: {
             q: query || "general",
-            apiKey: NEWS_API_KEY,
+            apiKey: import.meta.env.VITE_NEWS_API_KEY,
             page: pageNumber,
             pageSize: 10,
             sources: source,
@@ -171,11 +169,13 @@ const NewsFeed = () => {
         );
       } else if (query === "") {
         const [nytResponse, newsResponse] = await Promise.all([
-          axios.get(NYT_API_URL, { params: { "api-key": NYT_API_KEY } }),
-          axios.get(NEWS_BASE_URL, {
+          axios.get(import.meta.env.VITE_NYT_API_URL, {
+            params: { "api-key": import.meta.env.VITE_NYT_API_KEY },
+          }),
+          axios.get(import.meta.env.VITE_NEWS_BASE_URL, {
             params: {
               q: "news",
-              apiKey: NEWS_API_KEY,
+              apiKey: import.meta.env.VITE_NEWS_API_KEY,
               page: pageNumber,
               pageSize: 10,
               ...(fromDate && toDate && { from: fromDate, to: toDate }),
@@ -196,10 +196,10 @@ const NewsFeed = () => {
           ),
         ];
       } else {
-        response = await axios.get(NEWS_BASE_URL, {
+        response = await axios.get(import.meta.env.VITE_NEWS_BASE_URL, {
           params: {
             q: query,
-            apiKey: NEWS_API_KEY,
+            apiKey: import.meta.env.VITE_NEWS_API_KEY,
             page: pageNumber,
             pageSize: 10,
             ...(fromDate && toDate && { from: fromDate, to: toDate }),

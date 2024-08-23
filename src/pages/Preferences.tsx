@@ -35,7 +35,9 @@ const Preferences = () => {
     const fetchSources = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/top-headlines/sources?apiKey=ac33d88f4fb847b59c40282e5e7218d0"
+          `${import.meta.env.VITE_NEW_API_HEADLINE_URL}/sources?apiKey=${
+            import.meta.env.VITE_NEWS_API_KEY
+          }`
         );
         const data: SourceResponse = await response.json();
         const fetchedSources = data.sources;
@@ -54,7 +56,9 @@ const Preferences = () => {
     const fetchAuthors = async () => {
       try {
         const response = await fetch(
-          "https://newsapi.org/v2/everything?q=news&apiKey=ac33d88f4fb847b59c40282e5e7218d0"
+          `${import.meta.env.VITE_NEWS_BASE_URL}?q=news&apiKey=${
+            import.meta.env.VITE_NEWS_API_KEY
+          }`
         );
         const data: AuthorResponse = await response.json();
         const fetchedAuthors = [
